@@ -11,6 +11,7 @@ var Promise = require('bluebird')
 var index = require('./routes/index')
 var users = require('./routes/users')
 var userAddress = require('./routes/userAddress')
+var userOrder = require('./routes/userOrder')
 
 var app = express()
 
@@ -73,6 +74,7 @@ app.use(function (req, res, next) {
 app.use('/', index)
 app.use('/users', users)
 app.use('/user-address', userAddress)
+app.use('/user-order', userOrder)
 
 app.get('/file/:directoryPath/:name', function (req, res, next) {
   var directoryPath = ''
