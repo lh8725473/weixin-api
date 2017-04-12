@@ -6,6 +6,7 @@ var userOrderSchema = new mongoose.Schema({
   username: {type: String},
   sendId: {type: String},
   sendName: {type: String},
+  status: {type: Number},
   orderDetail: {type: String},
   createTime: {type: Date, default: Date.now},
   sendTime: {type: Date, default: Date.now},
