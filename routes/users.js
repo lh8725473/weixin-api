@@ -13,57 +13,54 @@ router.post('/login', function (req, res, next) {
     username: req.body.username,
     password: req.body.password
   }
-  // Promise.resolve(api.findOne(user))
-  Promise.bind()
-    .then(function () {
-      return api.findOne(user)
-    })
-    .then(function (result) {
-      console.log(result._id)
+
+  async function login(user) {
+    let db, collection, result;
+    try{
+      result = await api.findOne(user)
+    }catch(e){
+      console.error(e.message);
+    }
+
+    if (result) {
       var token = jwt.sign({
         exp: Math.floor(Date.now() / 1000) + (60 * 60),
-        data: result
+        data: result._id
       }, 'secret')
       res.send({
         success: true,
         message: '登录成功',
         token: token
       })
-    })
-    .catch(function (error) {
-      console.log(error)
-      res.send(error)
-    })
-  // api.findOne(user)
+    } else {
+      res.send( {
+        success: false,
+        message: '用户名密码不正确'
+      })
+    }
+  }
+
+  login(user)
+
+  // Promise.bind()
+  //   .then(function () {
+  //     return api.findOne(user)
+  //   })
   //   .then(function (result) {
+  //     console.log(result._id)
   //     var token = jwt.sign({
   //       exp: Math.floor(Date.now() / 1000) + (60 * 60),
-  //       data: user
+  //       data: result._id
   //     }, 'secret')
-  //     res.json({
+  //     res.send({
   //       success: true,
-  //       message: 'Enjoy your token!',
+  //       message: '登录成功',
   //       token: token
   //     })
   //   })
-  //   .catch(function (e) {
-  //     console.log('-------')
-  //     console.log(e)
-  //     res.json(e)
-  //     console.log('-------' + e)
-  //   })
-  // api.findOne(user)
-  //   .then(result => {
-  //     // 创建token
-  //     var token = jwt.sign({
-  //       exp: Math.floor(Date.now() / 1000) + (60 * 60),
-  //       data: user
-  //     }, 'secret')
-  //     res.json({
-  //       success: true,
-  //       message: 'Enjoy your token!',
-  //       token: token
-  //     })
+  //   .catch(function (error) {
+  //     console.log(error)
+  //     res.send(error)
   //   })
 })
 router.post('/sign-up', function (req, res, next) {
@@ -95,21 +92,39 @@ router.get('/user-list', function (req, res, next) {
   }
 
   // 返回20条数据
-  Promise
-    .all([api.find(query, null, options), api.count(query)])
-    .then(function (rep) {
-      var resObj = {
-        data: rep[0],
-        total: rep[1],
-        success: true
-      }
-      res.send(200, resObj)
-      // res.json(resObj)
+  async function userList() {
+    let userList, count;
+    try{
+      userList = await api.find(query, null, options)
+      count = await api.count(query)
+    }catch(e){
+      console.error(e.message);
+    }
+
+    res.send(200, {
+      data: userList,
+      total: count,
+      success: true
     })
-    .catch(function (e) {
-      res.json(e)
-      console.log('-------' + e)
-    })
+  }
+
+  userList()
+
+  // Promise
+  //   .all([api.find(query, null, options), api.count(query)])
+  //   .then(function (rep) {
+  //     var resObj = {
+  //       data: rep[0],
+  //       total: rep[1],
+  //       success: true
+  //     }
+  //     res.send(200, resObj)
+  //     // res.json(resObj)
+  //   })
+  //   .catch(function (e) {
+  //     res.json(e)
+  //     console.log('-------' + e)
+  //   })
   // // 查询所有数据，并按照age降序顺序返回数据
   // api.find({}, null, {sort: {age: -1}}) // 1是升序，-1是降序
   //   .then(result => {
