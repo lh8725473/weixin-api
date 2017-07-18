@@ -3,7 +3,7 @@ var router = express.Router()
 var userOrderApi = require('../lib/user-order-api')
 var Promise = require('bluebird')
 
-//增加
+// 增加
 router.post('/add', function (req, res, next) {
   var userId = req.api_user.data._id
   var username = req.api_user.data.username
@@ -62,7 +62,6 @@ router.post('/update', function (req, res, next) {
 
 // 查找单个
 router.get('/:id', function (req, res, next) {
-
   var _id = req.params.id
   var query = {
     _id: _id
@@ -92,10 +91,10 @@ router.get('/list', function (req, res, next) {
     query.keyword = keyword
   }
 
-  if(req.query.limit) {
+  if (req.query.limit) {
     options.limit = parseInt(req.query.limit)
   }
-  if(req.query.page) {
+  if (req.query.page) {
     options.skip = parseInt(req.query.limit) * (parseInt(req.query.page) - 1)
   }
 

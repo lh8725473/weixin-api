@@ -14,12 +14,12 @@ router.post('/login', function (req, res, next) {
     password: req.body.password
   }
 
-  async function login(user) {
-    let db, collection, result;
-    try{
+  async function login (user) {
+    let result
+    try {
       result = await api.findOne(user)
-    }catch(e){
-      console.error(e.message);
+    } catch (e) {
+      console.error(e.message)
     }
 
     if (result) {
@@ -33,7 +33,7 @@ router.post('/login', function (req, res, next) {
         token: token
       })
     } else {
-      res.send( {
+      res.send({
         success: false,
         message: '用户名密码不正确'
       })
@@ -64,16 +64,37 @@ router.post('/login', function (req, res, next) {
   //   })
 })
 router.post('/sign-up', function (req, res, next) {
-  var user = {
+  var createUser = {
     username: req.body.username,
     password: req.body.password,
     email: req.body.email
-  }
+  };
 
-  api.save(user)
-    .then(result => {
-      res.json(result)
-    })
+  // (async () => {
+  //   let user
+  //   try {
+  //     user = await api.save(createUser)
+  //     res.json(user)
+  //   } catch (e) {
+  //     console.error(e.message)
+  //   }
+  // })();
+
+  (async function () {
+    let user
+    try {
+      user = await api.save(createUser)
+      res.json(user)
+    } catch (e) {
+      console.error(e.message)
+    }
+  })()
+
+  // signUp()
+  // api.save(user)
+  //   .then(result => {
+  //     res.json(result)
+  //   })
 })
 router.get('/user-list', function (req, res, next) {
   console.log(req.api_user.data)
@@ -84,21 +105,21 @@ router.get('/user-list', function (req, res, next) {
     query.username = new RegExp(req.query.keyword)// 模糊查询参数
   }
 
-  if(req.query.limit) {
+  if (req.query.limit) {
     options.limit = parseInt(req.query.limit)
   }
-  if(req.query.page) {
+  if (req.query.page) {
     options.skip = parseInt(req.query.limit) * (parseInt(req.query.page) - 1)
   }
 
   // 返回20条数据
-  async function userList() {
-    let userList, count;
-    try{
+  async function userList () {
+    let userList, count
+    try {
       userList = await api.find(query, null, options)
       count = await api.count(query)
-    }catch(e){
-      console.error(e.message);
+    } catch (e) {
+      console.error(e.message)
     }
 
     res.send(200, {

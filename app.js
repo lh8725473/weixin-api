@@ -8,6 +8,8 @@ var bodyParser = require('body-parser')
 var responseTime = require('response-time')
 var jwt = require('jsonwebtoken')
 var Promise = require('bluebird')
+var multer = require('multer')
+var upload = multer({ dest: __dirname + '/public/uploads/' })
 
 var index = require('./routes/index')
 var users = require('./routes/users')
@@ -15,6 +17,7 @@ var userAddress = require('./routes/userAddress')
 var userOrder = require('./routes/userOrder')
 
 var app = express()
+var _ = require('lodash')
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -31,15 +34,29 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, x-access-token')
-  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'enctype, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, x-access-token, application/x-www-form-urlencoded')
+  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS,HEAD')
   res.header('X-Powered-By', ' 3.2.1')
   res.header('Content-Type', 'application/x-www-form-urlencoded')
   next()
 })
 
+// token 黑名单
+var tokenBlackList = []
+// 登出
+app.get('/user/login-out', function (req, res, next) {
+  console.log('call /users/login-out')
+  var token = req.body.token || req.query.token || req.headers['x-access-token']
+  tokenBlackList.push(token)
+  return res.send({
+    status: 200,
+    success: true,
+    message: '退出登录成功'
+  })
+})
+
 app.use(function (req, res, next) {
-  if (req.originalUrl === '/users/login') {
+  if (req.originalUrl === '/users/login' || req.originalUrl === '/users/sign-up') {
     next()
     return
   }
@@ -48,20 +65,29 @@ app.use(function (req, res, next) {
   var token = req.body.token || req.query.token || req.headers['x-access-token']
   // 解析 token
   if (token) {
+    if (_.indexOf(tokenBlackList, token) > -1) {
+      console.log('in tokenBlackList')
+      return res.send({
+        status: 403,
+        success: false,
+        message: 'token信息错误.'
+      })
+    } else {
+      jwt.verify(token, 'secret', function (err, decoded) {
+        if (err) {
+          return res.send({
+            status: 403,
+            success: false,
+            message: 'token信息错误.'
+          })
+        } else {
+          // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
+          req.api_user = decoded
+          next()
+        }
+      })
+    }
     // 确认token
-    jwt.verify(token, 'secret', function (err, decoded) {
-      if (err) {
-        return res.send({
-          status: 403,
-          success: false,
-          message: 'token信息错误.'
-        })
-      } else {
-        // 如果没问题就把解码后的信息保存到请求中，供后面的路由使用
-        req.api_user = decoded
-        next()
-      }
-    })
   } else {
     // 如果没有token，则返回错误
     return res.send({
@@ -76,6 +102,20 @@ app.use('/', index)
 app.use('/users', users)
 app.use('/user-address', userAddress)
 app.use('/user-order', userOrder)
+
+app.post('/profile', upload.single('file'), function (req, res, next) {
+  console.log('upload')
+  console.log(req.file)
+  console.log(req.body)
+  console.log(req.api_user)
+  console.log(req.api_user.data)
+
+  return res.send({
+    status: 200,
+    success: false,
+    message: '上传请求成功'
+  })
+})
 
 app.get('/file/:directoryPath/:name', function (req, res, next) {
   var directoryPath = ''
