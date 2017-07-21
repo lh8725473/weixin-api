@@ -8,13 +8,12 @@ var bodyParser = require('body-parser')
 var responseTime = require('response-time')
 var jwt = require('jsonwebtoken')
 var Promise = require('bluebird')
-var multer = require('multer')
-var upload = multer({ dest: __dirname + '/public/uploads/' })
 
 var index = require('./routes/index')
 var users = require('./routes/users')
 var userAddress = require('./routes/userAddress')
 var userOrder = require('./routes/userOrder')
+var upload = require('./routes/upload')
 
 var app = express()
 var _ = require('lodash')
@@ -55,6 +54,7 @@ app.get('/user/login-out', function (req, res, next) {
   })
 })
 
+// token 验证
 app.use(function (req, res, next) {
   if (req.originalUrl === '/users/login' || req.originalUrl === '/users/sign-up') {
     next()
@@ -102,20 +102,7 @@ app.use('/', index)
 app.use('/users', users)
 app.use('/user-address', userAddress)
 app.use('/user-order', userOrder)
-
-app.post('/profile', upload.single('file'), function (req, res, next) {
-  console.log('upload')
-  console.log(req.file)
-  console.log(req.body)
-  console.log(req.api_user)
-  console.log(req.api_user.data)
-
-  return res.send({
-    status: 200,
-    success: false,
-    message: '上传请求成功'
-  })
-})
+app.use('/upload', upload)
 
 app.get('/file/:directoryPath/:name', function (req, res, next) {
   var directoryPath = ''
