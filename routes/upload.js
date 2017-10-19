@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var multer = require('multer')
+var CONFIG = require('../config')
 var userApi = require('../lib/user-api')
 
 // var storage = multer.diskStorage({
@@ -8,8 +9,9 @@ var userApi = require('../lib/user-api')
 //     cb(null, req.api_user.data + '-' + Date.now() + file.originalname)
 //   }
 // })
+console.log(CONFIG.USER_LOGO_PATH)
 var upload = multer({
-  dest: '../public/uploads/'
+  dest: CONFIG.USER_LOGO_PATH
   // storage: storage
 })
 

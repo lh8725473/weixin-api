@@ -6,5 +6,5 @@ var UserAddressSchema = new mongoose.Schema({
   detail: {type: String}
 })
 // 创建Model
-var UserAddressModel = db.model('userAddress', UserAddressSchema)
+var UserAddressModel = db.model('user-address', UserAddressSchema, 'user-address')
 module.exports = UserAddressModel

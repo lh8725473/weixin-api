@@ -12,5 +12,5 @@ var UserSchema = new mongoose.Schema({
   time: {type: Date, default: Date.now}
 })
 // 创建Model
-var UserModel = db.model('user', UserSchema)
+var UserModel = db.model('user', UserSchema, 'user')
 module.exports = UserModel

@@ -3,8 +3,10 @@ var router = express.Router()
 var userAddressApi = require('../lib/user-address-api')
 var Promise = require('bluebird')
 
+// 增加地址
 router.post('/add', function (req, res, next) {
-  var userId = req.api_user.data._id
+  var userId = req.api_user.data
+  console.log(userId)
   var userAddress = {
     userId: userId,
     detail: req.body.detail
@@ -26,6 +28,49 @@ router.post('/add', function (req, res, next) {
     })
 })
 
+// 更新地址 
+router.put('/:id', function (req, res, next) {
+  var _id = req.params.id
+  var updateObj = {
+    detail: req.body.detail
+  }
+  async function updateAddress () {
+    try {
+      var result = await userAddressApi.update({_id: _id}, updateObj)
+      res.send({
+        success: true,
+        message: '更新地址成功',
+        data: result
+      })
+    } catch (error) {
+      res.send(error)
+    }
+  }
+
+  updateAddress()
+})
+
+// 删除地址
+router.delete('/:id', function (req, res, next) {
+  var _id = req.params.id
+  // Promise.resolve(api.findOne(user))
+  async function deleteAddress () {
+    try {
+      var result = await userAddressApi.remove({_id: _id})
+      res.send({
+        success: true,
+        message: '删除地址成功',
+        data: result
+      })
+    } catch (error) {
+      res.send(error)
+    }
+  }
+
+  deleteAddress()
+})
+
+// 查询地址
 router.get('/list', function (req, res, next) {
   var query = {}
   var options = {}
@@ -35,10 +80,10 @@ router.get('/list', function (req, res, next) {
     query.userId = userId
   }
 
-  if(req.query.limit) {
+  if (req.query.limit) {
     options.limit = parseInt(req.query.limit)
   }
-  if(req.query.page) {
+  if (req.query.page) {
     options.skip = parseInt(req.query.limit) * (parseInt(req.query.page) - 1)
   }
 

@@ -9,6 +9,12 @@ router.get('/login_test', function (req, res, next) {
 })
 
 router.post('/login', function (req, res, next) {
+  if (req.body.username === '') {
+    res.send({
+      success: false,
+      message: '用户名为空'
+    })
+  }
   var user = {
     username: req.body.username,
     password: req.body.password

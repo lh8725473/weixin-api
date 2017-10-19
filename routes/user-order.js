@@ -9,7 +9,7 @@ router.post('/add', function (req, res, next) {
   var username = req.api_user.data.username
   var userOrder = {
     userId: userId,
-    username: username,
+    username: req.body.username,
     status: 1,
     orderDetail: req.body.orderDetail,
     createTime: new Date(req.body.createTime)
