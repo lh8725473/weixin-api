@@ -10,9 +10,9 @@ var jwt = require('jsonwebtoken')
 var Promise = require('bluebird')
 
 var index = require('./routes/index')
-var users = require('./routes/users')
-var userAddress = require('./routes/userAddress')
-var userOrder = require('./routes/userOrder')
+var users = require('./routes/user')
+var userAddress = require('./routes/user-address')
+var userOrder = require('./routes/user-order')
 var upload = require('./routes/upload')
 
 var app = express()

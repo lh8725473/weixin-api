@@ -23,6 +23,41 @@ app.set('port', port)
 var server = http.createServer(app)
 
 /**
+ * Create sokect server.
+ */
+
+var socketApp = require('express')()
+var socketServer = require('http').createServer(socketApp)
+socketApp.all('*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'enctype, Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, x-access-token, application/x-www-form-urlencoded')
+  res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS,HEAD')
+  res.header('X-Powered-By', ' 3.2.1')
+  res.header('Content-Type', 'application/x-www-form-urlencoded')
+  next()
+})
+
+var io = require('socket.io')(socketServer)
+io.on('connection', function (socket) {
+  console.log('a user connected')
+  console.log(socket.handshake.query)
+  socket.on('disconnect', function () {
+    console.log('user disconnected')
+  })
+  socket.on('chat message', function (msg) {
+    console.log('message: ' + msg)
+    io.emit('chat message', msg)
+  })
+})
+
+socketServer.listen(6886)
+socketServer.on('listening', socketServerOnListening)
+
+function socketServerOnListening () {
+  console.error('socketServer Listening on ' + 6886)
+}
+
+/**
  * Listen on provided port, on all network interfaces.
  */
 
